@@ -18,14 +18,15 @@ def station(ident, directory, server=None, verbose=1):
     if server is None:
         server = 'https://www1.ncdc.noaa.gov/pub/data/igra/data/data-por/'
     url = "%s/%s-data.txt.zip" % (server, ident)
-    message(url, ' to ', directory + '/%s-data.txt.zip' % ident, verbose=verbose)
+    filename = os.path.join(directory, '%s-data.txt.zip' % ident)
+    message(url, ' to ', filename, verbose=verbose)
 
-    urllib.request.urlretrieve(url, directory + '/%s-data.txt.zip' % ident)
+    urllib.request.urlretrieve(url, filename)
 
-    if os.path.isfile(directory + '/%s-data.txt.zip' % ident):
-        message("Downloaded: ", directory + '/%s-data.txt.zip' % ident, verbose=verbose)
+    if os.path.isfile(filename):
+        message("Downloaded: ", filename, verbose=verbose)
     else:
-        message("File not found: ", directory + '/%s-data.txt.zip' % ident, verbose=verbose)
+        message("File not found: ", filename, verbose=verbose)
 
 
 def update(ident, directory, year='2018', verbose=1):
@@ -44,13 +45,14 @@ def update(ident, directory, year='2018', verbose=1):
     from .support import message
     os.makedirs(directory, exist_ok=True)
     url = "https://www1.ncdc.noaa.gov/pub/data/igra/data/data-y2d/%s-data-beg%s.txt.zip" % (ident, year)
-    message(url, ' to ', directory + '/%s-data-beg%s.txt.zip' % (ident, year), verbose=verbose)
-    urllib.request.urlretrieve(url, directory + '/%s-data-beg%s.txt.zip' % (ident, year))
+    filename = os.path.join(directory, '%s-data-beg%s.txt.zip' % (ident, year))
+    message(url, ' to ', filename, verbose=verbose)
+    urllib.request.urlretrieve(url, filename)
 
-    if os.path.isfile(directory + '/%s-data-beg%s.txt.zip' % (ident, year)):
-        message("Downloaded: ", directory + '/%s-data-beg%s.txt.zip' % (ident, year), verbose=verbose)
+    if os.path.isfile(filename):
+        message("Downloaded: ", filename, verbose=verbose)
     else:
-        message("File not found: ", directory + '/%s-data-beg%s.txt.zip' % (ident, year), verbose=verbose)
+        message("File not found: ", filename, verbose=verbose)
 
 
 def stationlist(directory, verbose=1):
@@ -68,14 +70,15 @@ def stationlist(directory, verbose=1):
     from .support import message
     from .read import stationlist as read_list
     os.makedirs(directory, exist_ok=True)
+    filename = os.path.join(directory, 'igra2-station-list.txt')
     urllib.request.urlretrieve("https://www1.ncdc.noaa.gov/pub/data/igra/igra2-station-list.txt",
-                               filename=directory + '/igra2-station-list.txt')
+                               filename=filename)
 
-    if os.path.isfile(directory + '/igra2-station-list.txt'):
+    if os.path.isfile(filename):
         message("Download complete, reading table ...", verbose=verbose)
-        return read_list(directory + '/igra2-station-list.txt', verbose=verbose)
+        return read_list(filename, verbose=verbose)
     else:
-        message("File not found: ", directory + '/igra2-station-list.txt', verbose=verbose)
+        message("File not found: ", filename, verbose=verbose)
 
 
 def metadata(directory, verbose=1):
@@ -90,13 +93,14 @@ def metadata(directory, verbose=1):
     import os
     from .support import message
     os.makedirs(directory, exist_ok=True)
+    filename = os.path.join(directory, 'igra2-metadata.txt')
     urllib.request.urlretrieve("https://www1.ncdc.noaa.gov/pub/data/igra/history/igra2-metadata.txt",
-                               filename=directory + '/igra2-metadata.txt')
+                               filename=filename)
 
-    if not os.path.isfile(directory + '/igra2-metadata.txt'):
-        message("File not found: ", directory + '/igra2-metadata.txt', verbose=verbose)
+    if not os.path.isfile(filename):
+        message("File not found: ", filename, verbose=verbose)
     else:
-        message("Downloaded: ", directory + '/igra2-metadata.txt', verbose=verbose)
+        message("Downloaded: ", filename, verbose=verbose)
 
 
 def uadb(ident, directory, email, pwd, verbose=1, **kwargs):
@@ -125,29 +129,30 @@ def uadb(ident, directory, email, pwd, verbose=1, **kwargs):
         message(ret.text, verbose=verbose)
         exit(1)
 
+    filename = os.path.join(directory, 'uadb_trhc_%s.txt' % ident)
     fileurl = "http://rda.ucar.edu/data/ds370.1/uadb_trhc_%s.txt" % ident
-    message(url, ' to ', directory + '/uadb_trhc_%s.txt' % ident, verbose=verbose)
+    message(url, ' to ', filename, verbose=verbose)
     try:
         req = requests.get(fileurl, cookies=ret.cookies, allow_redirects=True, stream=True)
         filesize = int(req.headers['Content-length'])
-        with open(directory + '/uadb_trhc_%s.txt' % ident, 'wb') as outfile:
+        with open(filename, 'wb') as outfile:
             chunk_size = 1048576
             for chunk in req.iter_content(chunk_size=chunk_size):
                 outfile.write(chunk)
                 if chunk_size < filesize:
-                    _check_file_status(directory + '/uadb_trhc_%s.txt' % ident, filesize)
+                    _check_file_status(filename, filesize)
 
-        _check_file_status(directory + '/uadb_trhc_%s.txt' % ident, filesize)
+        _check_file_status(filename, filesize)
     except Exception as e:
         message("Error: ", repr(e), verbose=verbose)
         if kwargs.get('debug', False):
             raise e
         return
 
-    if os.path.isfile(directory + '/uadb_trhc_%s.txt' % ident):
-        message("\nDownloaded: ", directory + '/uadb_trhc_%s.txt' % ident, verbose=verbose)
+    if os.path.isfile(filename):
+        message("\nDownloaded: ", filename, verbose=verbose)
     else:
-        message("\nFile not found: ", directory + '/uadb_trhc_%s.txt' % ident, verbose=verbose)
+        message("\nFile not found: ", filename, verbose=verbose)
 
 
 def _check_file_status(filepath, filesize):
