@@ -55,11 +55,11 @@ def update(ident, directory, year='2018', verbose=1):
         message("File not found: ", filename, verbose=verbose)
 
 
-def stationlist(directory, verbose=1):
+def stationlist(directory='./', verbose=1):
     """ Download the IGRAv2 station list
 
     Args:
-        directory (str): save directory for the raw list
+        directory (str): save directory for the raw list, default: "./", current directory
         verbose (int): verbosness
 
     Returns:

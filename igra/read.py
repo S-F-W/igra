@@ -688,12 +688,13 @@ UPDDATE      348-354   Character
     return data
 
 
-def stationlist(filename, verbose=1):
+def stationlist(filename, namerevise=True, verbose=1):
     """ Read IGRAv2 station list
 
     Args:
         filename (str): filename of station list
-        verbose (inr): verboseness
+        namerevise (bool): revise name to safely saved as csv
+        verbose (int): verboseness
 
     Returns:
         DataFrame : station informations
@@ -729,6 +730,8 @@ def stationlist(filename, verbose=1):
         alt = float(line[31:37])
         state = line[38:40]
         name = line[41:71]
+        if namerevise:
+            name.replace(',', ' ')
         start = int(line[72:76])
         end = int(line[77:81])
         count = int(line[82:88])
