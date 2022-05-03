@@ -731,7 +731,7 @@ def stationlist(filename, namerevise=True, verbose=1):
         state = line[38:40]
         name = line[41:71]
         if namerevise:
-            name.replace(',', ' ')
+            name = name.replace(',', ' ')
         start = int(line[72:76])
         end = int(line[77:81])
         count = int(line[82:88])
